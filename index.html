@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mandelbrot Viewer</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+        canvas {
+            display: block;
+        }
+        #controls {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 10;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div id="controls">
+        <label for="resolution">Resolution: </label>
+        <input type="range" id="resolution" min="0" max="10000" value="500">
+        <br><br>
+        <label for="colorPreset">Color Preset: </label>
+        <select id="colorPreset">
+            <option value="preset1">Purple-Orange-Yellow</option>
+            <option value="preset2">Yellow-Cyan-Magenta</option>
+            <option value="preset3">Red-Green-Blue</option>
+        </select>
+    </div>
+    <canvas id="canvas"></canvas>
+    <script src="mandelbrot.js"></script>
+</body>
+</html>
