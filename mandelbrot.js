@@ -190,7 +190,6 @@ function zoomHandler(event) {
 
 function resolutionHandler(event) {
     maxIterations = event.target.value;
-    hideControls();
     render();
 }
 
