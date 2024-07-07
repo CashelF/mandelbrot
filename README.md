@@ -6,8 +6,9 @@ This project provides a simple and interactive visualization of the Mandelbrot s
 
 - **Zooming**: Mouse wheel/trackpad two-finger drag to zoom in and out.
 - **Panning**: Click and drag to move around the set.
-- **Color Adjustment**: Choose from preset color themes or customize the colors.
+- **Color Adjustment**: Use the color pickers to customize the colors.
 - **Resolution Adjustment**: Change the number of iterations for finer or coarser detail.
+- **Settings Toggle**: Click the settings button to open the settings panel and customize the view. The settings panel automatically collapses when you interact with the Mandelbrot set.
 
 ## Technology
 
@@ -31,8 +32,9 @@ Upon loading the viewer, you will see the Mandelbrot set rendered in the browser
 
 - **Zoom**: Scroll the mouse wheel/two-finger drag the trackpad up to zoom in and down to zoom out.
 - **Pan**: Click and hold the left mouse button and move the mouse to pan around the set.
-- **Change Colors**: Select from the color presets or adjust the RGB sliders to change colors.
-- **Adjust Resolution**: Move the resolution slider to increase or decrease the number of iterations.
+- **Change Colors**: Click the settings button (⚙️) to open the settings panel. Use the color pickers to adjust the RGB values for customizing the colors.
+- **Adjust Resolution**: Move the resolution slider in the settings panel to increase or decrease the number of iterations.
+- **Close Settings Panel**: The settings panel automatically collapses when you interact with the Mandelbrot set (zoom, pan, etc.).
 
 ## Contributing
 

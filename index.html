@@ -12,7 +12,7 @@
         canvas {
             display: block;
         }
-        #controls {
+        #settingsButton {
             position: absolute;
             top: 10px;
             left: 10px;
@@ -20,20 +20,49 @@
             background: rgba(255, 255, 255, 0.8);
             padding: 10px;
             border-radius: 5px;
+            cursor: pointer;
+        }
+        #controls {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 9;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 10px;
+            border-radius: 5px;
+            display: none;
+        }
+        /* Default size for color pickers */
+        .colorPicker {
+            width: 150px;
+        }
+        /* Media query for smaller screens */
+        @media (max-width: 600px) {
+            .colorPicker {
+                width: 100px; /* Adjust size for smaller screens */
+            }
+            #resolution {
+                width: 100%; /* Make slider full width on smaller screens */
+            }
+            label[for="resolution"] {
+                display: block; /* Make label block element */
+                margin-bottom: 5px; /* Add space below the label */
+            }
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/@jaames/iro@5"></script>
 </head>
 <body>
+    <div id="settingsButton">⚙️</div>
     <div id="controls">
         <label for="resolution">Resolution: </label>
-        <input type="range" id="resolution" min="0" max="10000" value="500">
+        <input type="range" id="resolution" min="0" max="5000" value="500">
         <br><br>
-        <label for="colorPreset">Color Preset: </label>
-        <select id="colorPreset">
-            <option value="preset1">Purple-Orange-Yellow</option>
-            <option value="preset2">Yellow-Cyan-Magenta</option>
-            <option value="preset3">Red-Green-Blue</option>
-        </select>
+        <div id="colorPicker1" class="colorPicker"></div>
+        <br><br>
+        <div id="colorPicker2" class="colorPicker"></div>
+        <br><br>
+        <div id="colorPicker3" class="colorPicker"></div>
     </div>
     <canvas id="canvas"></canvas>
     <script src="mandelbrot.js"></script>

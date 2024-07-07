@@ -37,17 +37,15 @@ const fsSource = `
     uniform vec3 uColor3;
 
     void main(void) {
-        float aspectRatio = uResolution.y / uResolution.x;
-        // Adjust calculation for aspect ratio:
-        vec2 scaledCoords = vec2(gl_FragCoord.x, gl_FragCoord.y * aspectRatio);
-        vec2 c = ((scaledCoords / uResolution.xy) - 0.5) * uZoom + uCenter;
+        float aspectRatio = uResolution.x / uResolution.y;
+        vec2 scaledCoords = (gl_FragCoord.xy / uResolution - 0.5) * vec2(aspectRatio, 1.0) * uZoom + uCenter;
         vec2 z = vec2(0.0, 0.0);
         int iterations = 0;
         const int maxIterations = 10000;
         for (int i = 0; i < maxIterations; i++) {
             if (i >= uMaxIterations) break; // For dynamic max iterations
             if (length(z) > 2.0) break;
-            z = vec2(z.x * z.x - z.y * z.y + c.x, 2.0 * z.x * z.y + c.y);
+            z = vec2(z.x * z.x - z.y * z.y + scaledCoords.x, 2.0 * z.x * z.y + scaledCoords.y);
             iterations++;
         }
         float colorMix = float(iterations) / float(uMaxIterations);
@@ -56,7 +54,6 @@ const fsSource = `
         gl_FragColor = vec4(color, 1.0);
     }
 `;
-
 
 function createShader(gl, type, source) {
     const shader = gl.createShader(type);
@@ -120,39 +117,55 @@ function resizeCanvas() {
     render();
 }
 
+// Function to generate random RGB values
+function getRandomColor() {
+    return {
+        r: Math.floor(Math.random() * 256),
+        g: Math.floor(Math.random() * 256),
+        b: Math.floor(Math.random() * 256)
+    };
+}
+
 let centerX = -0.5;
 let centerY = 0;
 let zoom = 4;
 let maxIterations = 500;
-let color1 = [1.0, 0.0, 0.0];
-let color2 = [0.0, 1.0, 0.0];
-let color3 = [0.0, 0.0, 1.0];
 
-const colorPresets = {
-    preset1: {
-        color1: [0.5, 0.0, 0.5], // Purple
-        color2: [1.0, 0.5, 0.0], // Orange
-        color3: [1.0, 1.0, 0.0]  // Yellow
-    },
-    preset2: {
-        color1: [1.0, 1.0, 0.0], // Yellow
-        color2: [0.0, 1.0, 1.0], // Cyan
-        color3: [1.0, 0.0, 1.0]  // Magenta
-    },
-    preset3: {
-        color1: [1.0, 0.0, 0.0], // Red
-        color2: [0.0, 1.0, 0.0], // Green
-        color3: [0.0, 0.0, 1.0]  // Blue
-    }
-};
+// Convert random color objects to arrays
+let color1Obj = getRandomColor();
+let color2Obj = getRandomColor();
+let color3Obj = getRandomColor();
 
-function applyColorPreset(preset) {
-    const colors = colorPresets[preset];
-    color1 = colors.color1;
-    color2 = colors.color2;
-    color3 = colors.color3;
+let color1 = [color1Obj.r / 255, color1Obj.g / 255, color1Obj.b / 255];
+let color2 = [color2Obj.r / 255, color2Obj.g / 255, color2Obj.b / 255];
+let color3 = [color3Obj.r / 255, color3Obj.g / 255, color3Obj.b / 255];
+
+// Initialize color pickers with random colors
+const colorPicker1 = new iro.ColorPicker("#colorPicker1", {
+    width: document.body.clientWidth < 600 ? 100 : 150,
+    color: color1Obj
+});
+const colorPicker2 = new iro.ColorPicker("#colorPicker2", {
+    width: document.body.clientWidth < 600 ? 100 : 150,
+    color: color2Obj
+});
+const colorPicker3 = new iro.ColorPicker("#colorPicker3", {
+    width: document.body.clientWidth < 600 ? 100 : 150,
+    color: color3Obj
+});
+
+colorPicker1.on('color:change', function(color) {
+    color1 = [color.rgb.r / 255, color.rgb.g / 255, color.rgb.b / 255];
     render();
-}
+});
+colorPicker2.on('color:change', function(color) {
+    color2 = [color.rgb.r / 255, color.rgb.g / 255, color.rgb.b / 255];
+    render();
+});
+colorPicker3.on('color:change', function(color) {
+    color3 = [color.rgb.r / 255, color.rgb.g / 255, color.rgb.b / 255];
+    render();
+});
 
 function render() {
     gl.clear(gl.COLOR_BUFFER_BIT);
@@ -171,16 +184,14 @@ function render() {
 function zoomHandler(event) {
     const delta = event.deltaY * -0.01;
     zoom *= Math.pow(1.1, delta);
+    hideControls();
     render();
 }
 
 function resolutionHandler(event) {
     maxIterations = event.target.value;
+    hideControls();
     render();
-}
-
-function colorPresetHandler(event) {
-    applyColorPreset(event.target.value);
 }
 
 let isDragging = false;
@@ -191,6 +202,7 @@ function mouseDownHandler(event) {
     isDragging = true;
     lastMouseX = event.clientX;
     lastMouseY = event.clientY;
+    hideControls();
 }
 
 function mouseMoveHandler(event) {
@@ -229,6 +241,7 @@ function touchStartHandler(event) {
         lastMouseY = event.touches[0].clientY;
         event.preventDefault();
     }
+    hideControls();
 }
 
 function touchMoveHandler(event) {
@@ -274,9 +287,21 @@ canvas.addEventListener('mouseup', mouseUpHandler);
 canvas.addEventListener('mouseleave', mouseUpHandler);
 
 document.getElementById('resolution').addEventListener('input', resolutionHandler);
-document.getElementById('colorPreset').addEventListener('change', colorPresetHandler);
 window.addEventListener('resize', resizeCanvas);
 
 resizeCanvas();
-applyColorPreset('preset1');
 render();
+
+// Toggle settings panel
+const settingsButton = document.getElementById('settingsButton');
+const controls = document.getElementById('controls');
+
+settingsButton.addEventListener('click', () => {
+    controls.style.display = 'block';
+    settingsButton.style.display = 'none';
+});
+
+function hideControls() {
+    controls.style.display = 'none';
+    settingsButton.style.display = 'block';
+}
